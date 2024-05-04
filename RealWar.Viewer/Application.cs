@@ -15,7 +15,7 @@ unsafe class Application : IDisposable
 {
     static readonly Dictionary<string, string> filePickerFilter = new()
     {
-        { "Real War Assets", "bse,tgc" }
+        { "Real War Assets", "bse,tgc,spt" }
     };
 
     readonly List<IViewer> viewers = new();
@@ -118,6 +118,9 @@ unsafe class Application : IDisposable
                     case ".bse":
                         OpenBse(path);
                         break;
+                    case ".spt":
+                        OpenSpt(path);
+                        break;
                 }
             }
         }
@@ -145,6 +148,12 @@ unsafe class Application : IDisposable
             alphaTgc = Tgc.Read(File.ReadAllBytes(alphaTexPath));
 
         viewers.Add(new BseViewer(GetUniqueViewerName(Path.GetFileName(path)), bse, colorTgc, alphaTgc, gl));
+    }
+
+    void OpenSpt(string path)
+    {
+        var spt = Spt.Read(File.ReadAllBytes(path));
+        viewers.Add(new SptViewer(GetUniqueViewerName(Path.GetFileName(path)), spt, gl));
     }
 
     string GetUniqueViewerName(string name)

@@ -29,7 +29,7 @@ A work in progress viewer for asset files from the PC game [Real War (2001)](htt
 | .oct  | Sector Data  | ❔     |
 | .ovl  | Overlay Data | ❔     |
 | .prj  | Project      | ❔     |
-| .spt  | Sprite Table | 🚧     |
+| .spt  | Sprite Table | ✔     |
 | .s16  | ?            | 🚧     |
 | .sav  | Game Save    | ❔     |
 | .til  | Tile Data    | ❔     |

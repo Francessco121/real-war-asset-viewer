@@ -3,18 +3,18 @@ using System.IO;
 
 namespace RealWar.Viewer.Loaders;
 
-public class Tgc(int Width, int Height, ushort[] Pixels, uint Trailer)
+public class Tgc(int width, int height, ushort[] pixels, uint trailer)
 {
-    public readonly int Width = Width;
-    public readonly int Height = Height;
+    public readonly int Width = width;
+    public readonly int Height = height;
     /// <summary>
     /// ARGB1555 pixel data.
     /// </summary>
-    public readonly ushort[] Pixels = Pixels;
+    public readonly ushort[] Pixels = pixels;
     /// <summary>
     /// An unknown 32-bit trailer.
     /// </summary>
-    public readonly uint Trailer = Trailer;
+    public readonly uint Trailer = trailer;
 
     /// <summary>
     /// Reads a TGC file and decodes its pixel data.

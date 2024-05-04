@@ -28,6 +28,52 @@ public static class TexturePostProcessing
         };
     }
 
+    public static void ApplyFirstPixelAlphaMask(ushort[] pixels)
+    {
+        ushort mask = pixels[0];
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            ushort pixel = pixels[i];
+
+            int a = (pixel >> 15) & 0x1;
+            int r = (pixel >> 10) & 0x1F;
+            int g = (pixel >> 5) & 0x1F;
+            int b = (pixel >> 0) & 0x1F;
+
+            if (pixel == mask)
+                a = 1;
+
+            pixels[i] = (ushort)((a << 15) | (r << 10) | (g << 5) | (b));
+        };
+    }
+
+    public static uint[] ApplyAlphaMaskToRgba8888(ushort[] colorPixels, ushort[] alphaPixels)
+    {
+        var outPixels = new uint[colorPixels.Length];
+
+        for (int i = 0; i < colorPixels.Length; i++)
+        {
+            ushort colorPixel = colorPixels[i];
+            ushort alphaPixel = alphaPixels[i];
+
+            int r = (colorPixel >> 10) & 0x1F;
+            int g = (colorPixel >> 5) & 0x1F;
+            int b = (colorPixel >> 0) & 0x1F;
+
+            int a = (((alphaPixel >> 10) & 0x1F) + ((alphaPixel >> 5) & 0x1F) + ((alphaPixel >> 0) & 0x1F)) / 3;
+
+            r = (r * 255) / 31;
+            g = (g * 255) / 31;
+            b = (b * 255) / 31;
+            a = (a * 255) / 31;
+
+            outPixels[i] = (uint)((r << 24) | (g << 16) | (b << 8) | (a));
+        };
+
+        return outPixels;
+    }
+
     /// <summary>
     /// Applies the cammo to the given color pixels.
     /// Cammo pixels must include the top palette row.

@@ -93,6 +93,7 @@ unsafe class BseViewer : IViewer
     readonly uint framebuffer;
     uint colorBuffer;
     readonly uint depthBuffer;
+
     readonly uint animationPositionBuffer;
     readonly uint animationNormalBuffer;
     readonly uint animationUvBuffer;
@@ -362,6 +363,8 @@ unsafe class BseViewer : IViewer
         gl.DeleteVertexArray(vao);
         gl.DeleteBuffer(vbo);
         gl.DeleteProgram(shaderProgram);
+        if (colorTgc != null)
+            gl.DeleteTexture(texture);
         gl.DeleteFramebuffer(framebuffer);
         gl.DeleteTexture(colorBuffer);
         gl.DeleteRenderbuffer(depthBuffer);

@@ -15,7 +15,10 @@ unsafe class Application : IDisposable
 {
     static readonly Dictionary<string, string> filePickerFilter = new()
     {
-        { "Real War Assets", "bse,tgc,spt" }
+        { "Real War Assets", "bse,tgc,spt,s16" },
+        { "Models", "bse" },
+        { "Textures", "tgc" },
+        { "Sprites", "spt,s16" },
     };
 
     readonly List<IViewer> viewers = new();
@@ -121,6 +124,9 @@ unsafe class Application : IDisposable
                     case ".spt":
                         OpenSpt(path);
                         break;
+                    case ".s16":
+                        OpenS16(path);
+                        break;
                 }
             }
         }
@@ -154,6 +160,12 @@ unsafe class Application : IDisposable
     {
         var spt = Spt.Read(File.ReadAllBytes(path));
         viewers.Add(new SptViewer(GetUniqueViewerName(Path.GetFileName(path)), spt, gl));
+    }
+
+    void OpenS16(string path)
+    {
+        var s16 = S16.Read(File.ReadAllBytes(path));
+        viewers.Add(new S16Viewer(GetUniqueViewerName(Path.GetFileName(path)), s16, gl));
     }
 
     string GetUniqueViewerName(string name)

@@ -23,7 +23,8 @@ A work in progress viewer for asset files from the PC game [Real War (2001)](htt
 | .lod  | Lodgments    | ❔     |
 | .kmd  | Model        | 🚧     |
 | .map  | Map Data     | ❔     |
-| .mpg  | Video        | 🚧     |
+| .mpg  | Video        | ❔     |
+| .mpl  | Video        | ❔     |
 | .msk  | ?            | ❔     |
 | .mxs  | 3ds Max Scene | ❌    |
 | .oct  | Sector Data  | ❔     |
@@ -34,7 +35,7 @@ A work in progress viewer for asset files from the PC game [Real War (2001)](htt
 | .sav  | Game Save    | ❔     |
 | .til  | Tile Data    | ❔     |
 | .tgc  | Image        | ✔     |
-| .vag  | Audio        | 🚧     |
+| .vag  | Audio        | ✔     |
 
 ### `bigfile.dat` Support Table
 | Ext   | Type         | Status |

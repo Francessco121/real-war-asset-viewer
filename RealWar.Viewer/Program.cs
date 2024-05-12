@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using Silk.NET.GLFW;
+using Silk.NET.OpenAL;
 using Silk.NET.OpenGL;
 
 namespace RealWar.Viewer;
@@ -11,7 +12,7 @@ static unsafe class Program
 {
     static void Main(string[] args)
     {
-        Glfw glfw = Glfw.GetApi();
+        using Glfw glfw = Glfw.GetApi();
 
         if (!glfw.Init())
             throw new Exception("Failed to init GLFW.");
@@ -33,11 +34,26 @@ static unsafe class Program
 
         glfw.MakeContextCurrent(window);
 
-        GL gl = GL.GetApi(glfw.GetProcAddress);
+        using GL gl = GL.GetApi(glfw.GetProcAddress);
 
         gl.Enable(EnableCap.DebugOutput);
         gl.Enable(EnableCap.DebugOutputSynchronous);
         gl.DebugMessageCallback(OnOpenGLDebugMessage, null);
+
+        using ALContext alc = ALContext.GetApi(soft: true);
+        using AL al = AL.GetApi(soft: true);
+
+        {
+            Device* device = alc.OpenDevice("");
+            if (device == null)
+                throw new Exception("Failed to open OpenAL device.");
+
+            alc.MakeContextCurrent(alc.CreateContext(device, null));
+
+            AudioError error = al.GetError();
+            if (error != AudioError.NoError)
+                throw new Exception($"OpenAL error: {error}");
+        }
 
         glfw.GetFramebufferSize(window, out int framebufferWidth, out int framebufferHeight);
         gl.Viewport(0, 0, (uint)framebufferWidth, (uint)framebufferHeight);
@@ -45,7 +61,7 @@ static unsafe class Program
         double lastTime = glfw.GetTime();
         double maxDeltaTime = 1.0 / GetRefreshRate(glfw);
 
-        using (Application app = new Application(glfw, gl, window))
+        using (Application app = new Application(glfw, gl, al, window))
         {
             while (!glfw.WindowShouldClose(window))
             {

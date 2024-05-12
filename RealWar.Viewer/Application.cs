@@ -7,6 +7,7 @@ using NativeFileDialogs.Net;
 using RealWar.Viewer.Loaders;
 using RealWar.Viewer.Viewers;
 using Silk.NET.GLFW;
+using Silk.NET.OpenAL;
 using Silk.NET.OpenGL;
 
 namespace RealWar.Viewer;
@@ -15,23 +16,26 @@ unsafe class Application : IDisposable
 {
     static readonly Dictionary<string, string> filePickerFilter = new()
     {
-        { "Real War Assets", "bse,tgc,spt,s16" },
+        { "Real War Assets", "bse,tgc,spt,s16,vag" },
         { "Models", "bse" },
         { "Textures", "tgc" },
         { "Sprites", "spt,s16" },
+        { "Audio", "vag" },
     };
 
     readonly List<IViewer> viewers = new();
 
     readonly Glfw glfw;
     readonly GL gl;
+    readonly AL al;
     readonly WindowHandle* window;
     readonly ImGuiController imGui;
 
-    public Application(Glfw glfw, GL gl, WindowHandle* window)
+    public Application(Glfw glfw, GL gl, AL al, WindowHandle* window)
     {
         this.glfw = glfw;
         this.gl = gl;
+        this.al = al;
         this.window = window;
 
         imGui = new ImGuiController(gl, glfw, window);
@@ -46,6 +50,9 @@ unsafe class Application : IDisposable
         glfw.SetScrollCallback(window, OnScrollChanged);
 
         gl.ClearColor(0, 0, 0, 1);
+
+        al.SetListenerProperty(ListenerFloat.Gain, 0.25f);
+        AssertALError();
     }
 
     public void Dispose()
@@ -78,6 +85,18 @@ unsafe class Application : IDisposable
                     viewer.Dispose();
                 viewers.Clear();
             }
+
+            float gain;
+            al.GetListenerProperty(ListenerFloat.Gain, out gain);
+
+            float volume = gain * 100;
+            ImGui.PushItemWidth(100);
+            if (ImGui.SliderFloat("Volume", ref volume, 0, 100, "%.0f"))
+            {
+                al.SetListenerProperty(ListenerFloat.Gain, volume / 100f);
+                AssertALError();
+            }
+            ImGui.PopItemWidth();
 
             ImGui.EndMainMenuBar();
         }
@@ -127,6 +146,9 @@ unsafe class Application : IDisposable
                     case ".s16":
                         OpenS16(path);
                         break;
+                    case ".vag":
+                        OpenKvag(path);
+                        break;
                 }
             }
         }
@@ -166,6 +188,12 @@ unsafe class Application : IDisposable
     {
         var s16 = S16.Read(File.ReadAllBytes(path));
         viewers.Add(new S16Viewer(GetUniqueViewerName(Path.GetFileName(path)), s16, gl));
+    }
+
+    void OpenKvag(string path)
+    {
+        var kvag = Kvag.Read(File.ReadAllBytes(path));
+        viewers.Add(new KvagViewer(GetUniqueViewerName(Path.GetFileName(path)), kvag, al));
     }
 
     string GetUniqueViewerName(string name)
@@ -216,5 +244,12 @@ unsafe class Application : IDisposable
     void OnScrollChanged(WindowHandle* window, double offsetX, double offsetY)
     {
         imGui.OnScroll((float)offsetX, (float)offsetY);
+    }
+
+    void AssertALError()
+    {
+        AudioError error = al.GetError();
+        if (error != AudioError.NoError)
+            throw new Exception($"OpenAL error: {error}");
     }
 }

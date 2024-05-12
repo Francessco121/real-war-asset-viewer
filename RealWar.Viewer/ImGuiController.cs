@@ -349,8 +349,8 @@ unsafe class ImGuiController : IDisposable
 
         fontTexture = gl.GenTexture();
         gl.BindTexture(TextureTarget.Texture2D, fontTexture);
-        gl.TexParameterI(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
-        gl.TexParameterI(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
         gl.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
         gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)texWidth, (uint)texHeight, 0,
             PixelFormat.Rgba, PixelType.UnsignedByte, texData.ToPointer());
